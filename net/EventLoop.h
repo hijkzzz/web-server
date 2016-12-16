@@ -25,5 +25,4 @@ private:
     const pid_t threadId_;
 };
 
-
 #endif //NET_EVENTLOOP_H

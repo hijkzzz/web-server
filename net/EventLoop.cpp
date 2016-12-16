@@ -1,6 +1,6 @@
 #include <net/EventLoop.h>
+#include <base/Logging.h>
 
-#include <assert.h>
 #include <poll.h>
 
 __thread EventLoop *t_loopInThisThread = 0;
@@ -8,10 +8,10 @@ __thread EventLoop *t_loopInThisThread = 0;
 EventLoop::EventLoop()
         : looping_(false),
           threadId_(CurrentThread::tid()) {
-//    LOG_TRACE << "EventLoop created " << this << " in thread " << threadId_;
+    LOG_TRACE << "EventLoop created " << this << " in thread " << threadId_;
     if (t_loopInThisThread) {
-//        LOG_FATAL << "Another EventLoop " << t_loopInThisThread
-//                  << " exists in this thread " << threadId_;
+        LOG_FATAL << "Another EventLoop " << t_loopInThisThread
+                  << " exists in this thread " << threadId_;
     } else {
         t_loopInThisThread = this;
     }
@@ -29,12 +29,12 @@ void EventLoop::loop() {
 
     ::poll(NULL, 0, 5 * 1000);
 
-//    LOG_TRACE << "EventLoop " << this << " stop looping";
+    LOG_TRACE << "EventLoop " << this << " stop looping";
     looping_ = false;
 }
 
 void EventLoop::abortNotInLoopThread() {
-//    LOG_FATAL << "EventLoop::abortNotInLoopThread - EventLoop " << this
-//              << " was created in threadId_ = " << threadId_
-//              << ", current thread id = " << CurrentThread::tid();
+    LOG_FATAL << "EventLoop::abortNotInLoopThread - EventLoop " << this
+              << " was created in threadId_ = " << threadId_
+              << ", current thread id = " << CurrentThread::tid();
 }
