@@ -1,10 +1,13 @@
 #ifndef NET_CHANNEL_H
 #define NET_CHANNEL_H
 
-#include <boost/noncopyable.hpp>
+#include <base/NonCopyable.h>
+
 #include <functional>
 
-class Channel : boost::noncopyable {
+class EventLoop;
+
+class Channel : NonCopyable {
 public:
     typedef std::function<void()> EventCallback;
 
@@ -51,6 +54,5 @@ private:
     EventCallback writeCallback_;
     EventCallback errorCallback_;
 };
-
 
 #endif //NET_CHANNEL_H

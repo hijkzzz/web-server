@@ -1,4 +1,6 @@
 #include <net/Channel.h>
+
+#include <base/Logging.h>
 #include <net/EventLoop.h>
 
 #include <poll.h>
@@ -21,7 +23,7 @@ void Channel::update() {
 
 void Channel::handleEvent() {
     if (revents_ & POLLNVAL) {
-        LOG_WARN << "Channel::handle_event() POLLNVAL";
+        LOG_WARNING << "Channel::handle_event() POLLNVAL";
     }
 
     if (revents_ & (POLLERR | POLLNVAL)) {
