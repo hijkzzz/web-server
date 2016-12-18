@@ -1,19 +1,20 @@
 #include <net/EventLoop.h>
 
+#include <base/Logging.h>
 #include <net/Poller.h>
 #include <net/Channel.h>
-
-#include <base/Logging.h>
+#include <net/TimerQueue.h>
 
 __thread EventLoop *t_loopInThisThread = 0;
-// 超时时间
+// poll 超时时间
 const int kPollTimeMs = 10000;
 
 EventLoop::EventLoop()
         : looping_(false),
           quit_(false),
+          threadId_(std::this_thread::get_id()),
           poller_(new Poller(this)),
-          threadId_(std::this_thread::get_id()) {
+          timerQueue_(new TimerQueue(this)) {
     LOG_TRACE << "EventLoop created " << this << " in thread " << threadId_;
     if (t_loopInThisThread) {
         LOG_FATAL << "Another EventLoop " << t_loopInThisThread
@@ -36,13 +37,12 @@ void EventLoop::loop() {
 
     while (!quit_) {
         activeChannels_.clear();
-        poller_->poll(kPollTimeMs, &activeChannels_);
+        pollReturnTime_ = poller_->poll(kPollTimeMs, &activeChannels_);
         for (ChannelList::iterator it = activeChannels_.begin();
              it != activeChannels_.end(); ++it) {
             (*it)->handleEvent();
         }
     }
-
 
     LOG_TRACE << "EventLoop " << this << " stop looping";
     looping_ = false;
@@ -51,6 +51,20 @@ void EventLoop::loop() {
 void EventLoop::quit() {
     quit_ = true;
     // wakeup();
+}
+
+TimerId EventLoop::runAt(const Clock::time_point& time, const TimerCallback& cb) {
+    return timerQueue_->addTimer(cb, time, 0.0);
+}
+
+TimerId EventLoop::runAfter(int delay, const TimerCallback& cb) {
+    Clock::time_point time = Clock::now() + std::chrono::microseconds(delay);
+    return runAt(time, cb);
+}
+
+TimerId EventLoop::runEvery(int interval, const TimerCallback& cb) {
+    Clock::time_point time = Clock::now() + std::chrono::microseconds(interval);
+    return timerQueue_->addTimer(cb, time, interval);
 }
 
 void EventLoop::updateChannel(Channel *channel) {

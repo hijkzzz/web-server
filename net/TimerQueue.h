@@ -2,52 +2,46 @@
 #define NET_TIMERQUEUE_H
 
 #include <base/NonCopyable.h>
+#include <net/Callbacks.h>
+#include <net/Channel.h>
 
 #include <vector>
 #include <set>
+#include <utility>
+#include <memory>
+#include <chrono>
 
 class EventLoop;
 class Timer;
 class TimerId;
 
-/// A best efforts timer queue.
-/// No guarantee that the callback will be on time.
 class TimerQueue : NonCopyable {
 public:
-    TimerQueue(EventLoop *loop);
+    using Clock = std::chrono::steady_clock;
 
+    TimerQueue(EventLoop *loop);
     ~TimerQueue();
 
-    /// Schedules the callback to be run at given time,
-    /// repeats if @c interval > 0.0.
-    /// Must be thread safe. Usually be called from other threads.
     TimerId addTimer(const TimerCallback &cb,
-                     Timestamp when,
-                     double interval);
+                     Clock::time_point when,
+                     int interval);
 
     // void cancel(TimerId timerId);
 
 private:
+    using Entry =  std::pair<Clock::time_point, std::shared_ptr<Timer>>;
+    using TimerList =  std::set<Entry>;
 
-    // FIXME: use unique_ptr<Timer> instead of raw pointers.
-    typedef std::pair<Timestamp, Timer *> Entry;
-    typedef std::set <Entry>              TimerList;
+    void handleRead(); // called when timerfd alarms
+    std::vector<Entry> getExpired(Clock::time_point now); // move out all expired timers
+    void reset(std::vector<Entry> &expired, Clock::time_point now);
 
-    // called when timerfd alarms
-    void handleRead();
-
-    // move out all expired timers
-    std::vector <Entry> getExpired(Timestamp now);
-
-    void reset(const std::vector <Entry> &expired, Timestamp now);
-
-    bool insert(Timer *timer);
+    bool insert(std::shared_ptr<Timer>& timer);
 
     EventLoop *loop_;
     const int timerfd_;
     Channel   timerfdChannel_;
-    // Timer list sorted by expiration
-    TimerList timers_;
+    TimerList timers_; // Timer list sorted by expiration
 };
 
 

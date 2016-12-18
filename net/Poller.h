@@ -12,21 +12,18 @@ struct pollfd;
 class Channel;
 
 // Poller 并不拥有 Channel
-// IO Multiplexing with poll(2).
 class Poller : NonCopyable {
 public:
-    typedef std::vector<Channel *> ChannelList;
-    typedef std::chrono::system_clock::time_point Timestamp;
+    using ChannelList =  std::vector<Channel *>;
+    using Clock = std::chrono::steady_clock;
 
     Poller(EventLoop *loop);
     ~Poller();
 
     // 只能在 Loop 线程调用
-    // Polls the I/O events.
-    Timestamp poll(int timeoutMs, ChannelList *activeChannels);
+    Clock::time_point poll(int timeoutMs, ChannelList *activeChannels);
 
     // 只能在 Loop 线程调用
-    // Changes the interested I/O events.
     void updateChannel(Channel *channel);
 
     void assertInLoopThread() { ownerLoop_->assertInLoopThread(); }
@@ -35,8 +32,8 @@ private:
     void fillActiveChannels(int numEvents,
                             ChannelList *activeChannels) const;
 
-    typedef std::vector<struct pollfd> PollFdList;
-    typedef std::map<int, Channel *>   ChannelMap;
+    using PollFdList =  std::vector<struct pollfd>;
+    using ChannelMap =  std::map<int, Channel *>;
 
     EventLoop  *ownerLoop_;
     PollFdList pollfds_;

@@ -9,10 +9,9 @@ add_definitions(-DBOOST_LOG_DYN_LINK)
 
 include_directories(.)
 
-add_subdirectory(base)
 add_subdirectory(net)
 
 aux_source_directory(. SOURCE_FILES)
 add_executable(speedX ${SOURCE_FILES})
 target_link_libraries(speedX
-                        base net boost_log)
+        net boost_log)

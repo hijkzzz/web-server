@@ -1,7 +1,6 @@
 #include <net/Poller.h>
 
 #include <base/Logging.h>
-#include <net/EventLoop.h>
 #include <net/Channel.h>
 
 #include <poll.h>
@@ -13,10 +12,10 @@ Poller::Poller(EventLoop *loop)
 Poller::~Poller() {
 }
 
-Poller::Timestamp Poller::poll(int timeoutMs, ChannelList *activeChannels) {
+std::chrono::steady_clock::time_point Poller::poll(int timeoutMs, ChannelList *activeChannels) {
     // XXX pollfds_ shouldn't change
     int       numEvents = ::poll(pollfds_.data(), pollfds_.size(), timeoutMs);
-    Timestamp now = std::chrono::system_clock::now();
+    Clock::time_point now = Clock::now();
     if (numEvents > 0) {
         LOG_TRACE << numEvents << " events happended";
         fillActiveChannels(numEvents, activeChannels);

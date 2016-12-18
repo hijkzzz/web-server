@@ -27,7 +27,7 @@ int main() {
 
     struct itimerspec howlong;
     bzero(&howlong, sizeof howlong);
-    howlong.it_value.tv_sec = 5;
+    howlong.it_value.tv_sec = 1;
     ::timerfd_settime(timerfd, 0, &howlong, NULL);
 
     loop.loop();
