@@ -77,6 +77,7 @@ TimerId TimerQueue::addTimer(const TimerCallback &cb,
 
     if (earliestChanged) {
         resetTimerfd(timerfd_, timer->expiration());
+        LOG_TRACE << "reset Timerfd when" << when.time_since_epoch().count() / 1000;
     }
     return TimerId(timer.get());
 }
@@ -94,6 +95,7 @@ void TimerQueue::handleRead() {
         it->second->run();
     }
 
+    // restart Timer and reset timerfd
     reset(expired, now);
     // ~vector<Entry> will clean Timers
 }
@@ -114,10 +116,11 @@ std::vector<TimerQueue::Entry> TimerQueue::getExpired(Clock::time_point now) {
 }
 
 void TimerQueue::reset(std::vector<Entry> &expired, Clock::time_point now) {
-    Clock::time_point nextExpire;
+    // max 作为无效值
+    Clock::time_point nextExpire = nextExpire.max();
 
     for (std::vector<Entry>::iterator it = expired.begin();
-         it != expired.end();) {
+         it != expired.end();++it) {
         if (it->second->repeat()) {
             it->second->restart(now);
             insert(it->second);
@@ -129,6 +132,7 @@ void TimerQueue::reset(std::vector<Entry> &expired, Clock::time_point now) {
     }
 
     if (nextExpire != nextExpire.max()) {
+        LOG_TRACE << "reset Timerfd nextExpire " << nextExpire.time_since_epoch().count() / 1000;
         resetTimerfd(timerfd_, nextExpire);
     }
 }

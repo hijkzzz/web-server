@@ -13,7 +13,7 @@ public:
             : callback_(cb),
               expiration_(when),
               interval_(interval),
-              repeat_(interval > 0.0) {}
+              repeat_(interval > 0) {}
 
     void run() const {
         callback_();
