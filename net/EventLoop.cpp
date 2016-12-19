@@ -143,7 +143,7 @@ void EventLoop::doPendingFunctors() {
     callingPendingFunctors_ = true;
 
     {
-        std::lock_guard lock(mutex_);
+        std::lock_guard<std::mutex> lock(mutex_);
         functors.swap(pendingFunctors_);
     }
 

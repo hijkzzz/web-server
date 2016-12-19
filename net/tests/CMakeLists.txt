@@ -9,3 +9,8 @@ add_executable(test2 test2.cpp)
 target_link_libraries(test2
                         net)
 add_test(NAME test2 COMMAND test2)
+
+add_executable(test3 test3.cpp)
+target_link_libraries(test3
+                        net)
+add_test(NAME test3 COMMAND test3)

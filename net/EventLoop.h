@@ -19,7 +19,7 @@ class TimerId;
 class EventLoop : NonCopyable {
 public:
     using Clock = std::chrono::steady_clock;
-    using Functor = std::function;
+    using Functor = std::function<void()>;
 
     EventLoop();
     ~EventLoop();
