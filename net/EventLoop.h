@@ -8,6 +8,8 @@
 #include <thread>
 #include <memory>
 #include <vector>
+#include <functional>
+#include <mutex>
 
 class Poller;
 class Channel;
@@ -17,6 +19,7 @@ class TimerId;
 class EventLoop : NonCopyable {
 public:
     using Clock = std::chrono::steady_clock;
+    using Functor = std::function;
 
     EventLoop();
     ~EventLoop();
@@ -26,10 +29,14 @@ public:
 
     Clock::time_point pollReturnTime() const { return pollReturnTime_; }
 
+    void runInLoop(const Functor& cb);
+    void queueInLoop(const Functor& cb);
+
     TimerId runAt(const Clock::time_point& time, const TimerCallback& cb);
     TimerId runAfter(int delay, const TimerCallback& cb);
     TimerId runEvery(int interval, const TimerCallback& cb);
 
+    void wakeup(); // 唤醒循环
     void updateChannel(Channel *channel);
 
     void assertInLoopThread() {
@@ -42,16 +49,24 @@ public:
 
 private:
     void abortNotInLoopThread();
+    void handleRead();
+    void doPendingFunctors();
 
     using ChannelList =  std::vector<Channel *>;
 
-    bool                    looping_;
-    bool                    quit_;
-    const std::thread::id   threadId_;
-    Clock::time_point pollReturnTime_;
-    std::unique_ptr<Poller> poller_;
+    bool                        looping_;
+    bool                        quit_;
+    bool                        callingPendingFunctors_;
+    const std::thread::id       threadId_;
+    Clock::time_point           pollReturnTime_;
+    std::unique_ptr<Poller>     poller_;
     std::unique_ptr<TimerQueue> timerQueue_;
-    ChannelList             activeChannels_;
+    int                         wakeupFd_;
+    std::unique_ptr<Channel>    wakeupChannel_;
+
+    ChannelList                 activeChannels_;
+    std::mutex                  mutex_;
+    std::vector<Functor>        pendingFunctors_;
 };
 
 #endif //NET_EVENTLOOP_H

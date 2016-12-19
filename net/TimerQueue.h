@@ -32,6 +32,7 @@ private:
     using Entry =  std::pair<Clock::time_point, std::shared_ptr<Timer>>;
     using TimerList =  std::set<Entry>;
 
+    void addTimerInLoop(std::shared_ptr<Timer> timer);
     void handleRead(); // called when timerfd alarms
     std::vector<Entry> getExpired(Clock::time_point now); // move out all expired timers
     void reset(std::vector<Entry> &expired, Clock::time_point now);

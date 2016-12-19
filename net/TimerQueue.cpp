@@ -68,18 +68,23 @@ TimerQueue::~TimerQueue() {
     ::close(timerfd_);
 }
 
+/// 线程安全的版本
 TimerId TimerQueue::addTimer(const TimerCallback &cb,
                              Clock::time_point when,
                              int interval) {
     std::shared_ptr<Timer> timer(new Timer(cb, when, interval));
+    // 转发到 IO 线程
+    loop_->runInLoop(std::bind(&TimerQueue::addTimerInLoop, this, timer));
+    return TimerId(timer.get());
+}
+
+void TimerQueue::addTimerInLoop(std::shared_ptr<Timer> timer) {
     loop_->assertInLoopThread();
     bool earliestChanged = insert(timer);
 
     if (earliestChanged) {
         resetTimerfd(timerfd_, timer->expiration());
-        LOG_TRACE << "reset Timerfd when" << when.time_since_epoch().count() / 1000;
     }
-    return TimerId(timer.get());
 }
 
 void TimerQueue::handleRead() {

@@ -25,8 +25,8 @@ public:
 
 private:
     const TimerCallback callback_;
-    Clock::time_point expiration_;
-    const int        interval_;
+    Clock::time_point   expiration_;
+    const int           interval_;
     const bool          repeat_;
 };
 
