@@ -8,11 +8,11 @@ namespace {
     using SA =  struct sockaddr;
 
     const SA *sockaddr_cast(const struct sockaddr_in *addr) {
-        return static_cast<const SA *>(addr);
+        return reinterpret_cast<const SA *>(addr);
     }
 
     SA *sockaddr_cast(struct sockaddr_in *addr) {
-        return static_cast<SA *>(addr);
+        return reinterpret_cast<SA *>(addr);
     }
 
     void setNonBlockAndCloseOnExec(int sockfd) {

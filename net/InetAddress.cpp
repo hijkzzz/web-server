@@ -2,6 +2,8 @@
 
 #include <net/SocketsOps.h>
 
+#include <strings.h>
+
 static const in_addr_t kInaddrAny = INADDR_ANY;
 
 static_assert(sizeof(InetAddress) == sizeof(struct sockaddr_in));

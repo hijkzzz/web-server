@@ -13,5 +13,4 @@ add_subdirectory(net)
 
 aux_source_directory(. SOURCE_FILES)
 add_executable(speedX ${SOURCE_FILES})
-target_link_libraries(speedX
-        net boost_log)
+target_link_libraries(speedX net)

@@ -3,6 +3,8 @@
 #include <net/SocketsOps.h>
 #include <net/InetAddress.h>
 
+#include <strings.h>
+
 Socket::~Socket() {
     sockets::close(sockfd_);
 }

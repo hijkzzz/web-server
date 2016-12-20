@@ -29,9 +29,11 @@ public:
 
     Clock::time_point pollReturnTime() const { return pollReturnTime_; }
 
+    // thread safe
     void runInLoop(const Functor& cb);
     void queueInLoop(const Functor& cb);
 
+    // thread safe
     TimerId runAt(const Clock::time_point& time, const TimerCallback& cb);
     TimerId runAfter(int delay, const TimerCallback& cb);
     TimerId runEvery(int interval, const TimerCallback& cb);
