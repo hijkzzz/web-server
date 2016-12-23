@@ -10,7 +10,6 @@
 #include <set>
 #include <utility>
 #include <memory>
-#include <chrono>
 
 class EventLoop;
 class Timer;
@@ -18,8 +17,6 @@ class TimerId;
 
 class TimerQueue : boost::noncopyable {
 public:
-    using Clock = std::chrono::steady_clock;
-
     TimerQueue(EventLoop *loop);
     ~TimerQueue();
 

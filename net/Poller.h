@@ -2,6 +2,7 @@
 #define NET_POLLER_H
 
 #include <net/EventLoop.h>
+#include <net/Callbacks.h>
 
 #include <boost/noncopyable.hpp>
 
@@ -16,7 +17,6 @@ class Channel;
 class Poller : boost::noncopyable {
 public:
     using ChannelList =  std::vector<Channel *>;
-    using Clock = std::chrono::steady_clock;
 
     Poller(EventLoop *loop);
     ~Poller();

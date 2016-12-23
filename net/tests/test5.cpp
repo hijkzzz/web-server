@@ -21,10 +21,10 @@ void onConnection(const TcpConnectionPtr &conn) {
 }
 
 void onMessage(const TcpConnectionPtr &conn,
-               const char *data,
-               ssize_t len) {
+               Buffer *data,
+               Clock::time_point receiveTime) {
     printf("onMessage(): received %zd bytes from connection [%s]\n",
-           len, conn->name().c_str());
+           data->readableBytes(), conn->name().c_str());
 }
 
 int main() {

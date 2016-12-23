@@ -19,7 +19,6 @@ class TimerId;
 
 class EventLoop : boost::noncopyable {
 public:
-    using Clock = std::chrono::steady_clock;
     using Functor = std::function<void()>;
 
     EventLoop();

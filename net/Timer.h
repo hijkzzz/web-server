@@ -2,14 +2,11 @@
 #define NET_TIMER_H
 
 #include <net/Callbacks.h>
-#include <chrono>
 
 #include <boost/noncopyable.hpp>
 
 class Timer : boost::noncopyable {
 public:
-    using Clock = std::chrono::steady_clock;
-
     Timer(const TimerCallback &cb, Clock::time_point when, int interval)
             : callback_(cb),
               expiration_(when),

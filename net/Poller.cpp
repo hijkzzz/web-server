@@ -12,7 +12,7 @@ Poller::Poller(EventLoop *loop)
 Poller::~Poller() {
 }
 
-Poller::Clock::time_point Poller::poll(int timeoutMs, ChannelList *activeChannels) {
+Clock::time_point Poller::poll(int timeoutMs, ChannelList *activeChannels) {
     // XXX pollfds_ shouldn't change
     int       numEvents = ::poll(pollfds_.data(), pollfds_.size(), timeoutMs);
     Clock::time_point now = Clock::now();

@@ -11,6 +11,7 @@
 class Channel;
 class EventLoop;
 class Socket;
+class Buffer;
 
 class TcpConnection : boost::noncopyable,
                       public std::enable_shared_from_this<TcpConnection> {
@@ -47,7 +48,7 @@ private:
     };
 
     void setState(StateE s) { state_ = s; }
-    void handleRead();
+    void handleRead(Clock::time_point receiveTime);
     void handleWrite();
     void handleClose();
     void handleError();
@@ -63,6 +64,7 @@ private:
     ConnectionCallback       connectionCallback_;
     MessageCallback          messageCallback_;
     CloseCallback            closeCallback_;
+    Buffer                   inputBuffer_;
 };
 
 #endif
