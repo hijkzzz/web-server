@@ -23,3 +23,7 @@ add_test(NAME test5 COMMAND test5)
 add_executable(test6 test6.cpp)
 target_link_libraries(test6 net)
 add_test(NAME test6 COMMAND test6)
+
+add_executable(test7 test7.cpp)
+target_link_libraries(test7 net)
+add_test(NAME test7 COMMAND test7)

@@ -42,7 +42,7 @@ void TcpServer::start() {
 
     if (!acceptor_->listenning()) {
         loop_->runInLoop(
-                std::bind(&Acceptor::listen, acceptor_.get());
+                std::bind(&Acceptor::listen, acceptor_.get()));
     }
 }
 
