@@ -17,7 +17,7 @@ int createTimerfd() {
     return timerfd;
 }
 
-struct timespec howMuchTimeFromNow(TimerQueue::Clock::time_point when) {
+struct timespec howMuchTimeFromNow(Clock::time_point when) {
     int64_t microseconds =
                     std::chrono::duration_cast<std::chrono::microseconds>(
                             when - std::chrono::steady_clock::now()).count();
@@ -31,7 +31,7 @@ struct timespec howMuchTimeFromNow(TimerQueue::Clock::time_point when) {
     return ts;
 }
 
-void readTimerfd(int timerfd, TimerQueue::Clock::time_point now) {
+void readTimerfd(int timerfd, Clock::time_point now) {
     uint64_t howmany;
     ssize_t  n = ::read(timerfd, &howmany, sizeof howmany);
     LOG_TRACE << "TimerQueue::handleRead() " << howmany << " at " << now.time_since_epoch().count();
@@ -40,7 +40,7 @@ void readTimerfd(int timerfd, TimerQueue::Clock::time_point now) {
     }
 }
 
-void resetTimerfd(int timerfd, TimerQueue::Clock::time_point expiration) {
+void resetTimerfd(int timerfd, Clock::time_point expiration) {
     // wake up loop by timerfd_settime()
     struct itimerspec newValue;
     struct itimerspec oldValue;

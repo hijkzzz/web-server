@@ -3,6 +3,7 @@
 
 #include <net/Callbacks.h>
 #include <net/InetAddress.h>
+#include <net/Buffer.h>
 
 #include <boost/noncopyable.hpp>
 
@@ -11,7 +12,6 @@
 class Channel;
 class EventLoop;
 class Socket;
-class Buffer;
 
 class TcpConnection : boost::noncopyable,
                       public std::enable_shared_from_this<TcpConnection> {

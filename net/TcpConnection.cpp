@@ -5,6 +5,7 @@
 #include <net/EventLoop.h>
 #include <net/Socket.h>
 #include <net/SocketsOps.h>
+#include <net/Buffer.h>
 
 #include <functional>
 
