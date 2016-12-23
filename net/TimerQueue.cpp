@@ -1,6 +1,6 @@
 #include <net/TimerQueue.h>
 
-#include <base/Logging.h>
+#include <net/Logging.h>
 #include <net/EventLoop.h>
 #include <net/Timer.h>
 #include <net/TimerId.h>

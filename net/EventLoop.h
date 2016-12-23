@@ -1,9 +1,10 @@
 #ifndef NET_EVENTLOOP_H
 #define NET_EVENTLOOP_H
 
-#include <base/NonCopyable.h>
 #include <net/Callbacks.h>
 #include <net/TimerId.h>
+
+#include <boost/noncopyable.hpp>
 
 #include <thread>
 #include <memory>
@@ -16,7 +17,7 @@ class Channel;
 class TimerQueue;
 class TimerId;
 
-class EventLoop : NonCopyable {
+class EventLoop : boost::noncopyable {
 public:
     using Clock = std::chrono::steady_clock;
     using Functor = std::function<void()>;
@@ -40,6 +41,7 @@ public:
 
     void wakeup(); // 唤醒循环
     void updateChannel(Channel *channel);
+    void removeChannel(Channel* channel);
 
     void assertInLoopThread() {
         if (!isInLoopThread()) {

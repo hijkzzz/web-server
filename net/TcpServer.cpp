@@ -1,13 +1,13 @@
 #include <net/TcpServer.h>
 
-#include <base/Logging.h>
+#include <net/Logging.h>
 #include <net/EventLoop.h>
 #include <net/Acceptor.h>
 #include <net/InetAddress.h>
 #include <net/SocketsOps.h>
 #include <net/TcpConnection.h>
 
-#include <stdio.h>
+#include <functional>
 
 TcpServer::TcpServer(EventLoop *loop, const InetAddress &listenAddr)
         : loop_(loop),
@@ -43,16 +43,30 @@ void TcpServer::newConnection(int sockfd, const InetAddress &peerAddr) {
     char buf[32];
     snprintf(buf, sizeof buf, "#%d", nextConnId_);
     ++nextConnId_;
-    std::string connName = name_ + buf;
+    std::string      connName = name_ + buf;
 
     LOG_INFO << "TcpServer::newConnection [" << name_
              << "] - new connection [" << connName
              << "] from " << peerAddr.toHostPort();
     InetAddress      localAddr(sockets::getLocalAddr(sockfd));
     // FIXME poll with zero timeout to double confirm the new connection
-    TcpConnectionPtr conn(new TcpConnection(loop_, connName, sockfd, localAddr, peerAddr));
+    TcpConnectionPtr conn(
+            new TcpConnection(loop_, connName, sockfd, localAddr, peerAddr));
     connections_[connName] = conn;
     conn->setConnectionCallback(connectionCallback_);
     conn->setMessageCallback(messageCallback_);
+    conn->setCloseCallback(
+            std::bind(&TcpServer::removeConnection, this, std::placeholders::_1));
     conn->connectEstablished();
+}
+
+void TcpServer::removeConnection(const TcpConnectionPtr &conn) {
+    loop_->assertInLoopThread();
+    LOG_INFO << "TcpServer::removeConnection [" << name_
+             << "] - connection " << conn->name();
+    size_t n = connections_.erase(conn->name());
+    assert(n == 1);
+    (void) n;
+    loop_->queueInLoop(
+            std::bind(&TcpConnection::connectDestroyed, conn));
 }

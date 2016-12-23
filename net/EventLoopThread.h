@@ -1,7 +1,7 @@
 #ifndef NET_EVENTLOOPTHREAD_H
 #define NET_EVENTLOOPTHREAD_H
 
-#include <base/NonCopyable.h>
+#include <boost/noncopyable.hpp>
 
 #include <thread>
 #include <mutex>
@@ -10,7 +10,7 @@
 
 class EventLoop;
 
-class EventLoopThread : NonCopyable{
+class EventLoopThread : boost::noncopyable {
 public:
     EventLoopThread();
     ~EventLoopThread();

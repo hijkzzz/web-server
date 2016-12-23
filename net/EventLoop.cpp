@@ -1,6 +1,6 @@
 #include <net/EventLoop.h>
 
-#include <base/Logging.h>
+#include <net/Logging.h>
 #include <net/Poller.h>
 #include <net/Channel.h>
 #include <net/TimerQueue.h>
@@ -114,6 +114,12 @@ void EventLoop::updateChannel(Channel *channel) {
     assert(channel->ownerLoop() == this);
     assertInLoopThread();
     poller_->updateChannel(channel);
+}
+
+void EventLoop::removeChannel(Channel *channel) {
+    assert(channel->ownerLoop() == this);
+    assertInLoopThread();
+    poller_->removeChannel(channel);
 }
 
 void EventLoop::abortNotInLoopThread() {

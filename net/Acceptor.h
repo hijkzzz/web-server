@@ -1,16 +1,17 @@
 #ifndef NET_ACCEPTOR_H
 #define NET_ACCEPTOR_H
 
-#include <base/NonCopyable.h>
 #include <net/Socket.h>
 #include <net/Channel.h>
+
+#include <boost/noncopyable.hpp>
 
 #include <functional>
 
 class EventLoop;
 class InetAddress;
 
-class Acceptor : NonCopyable {
+class Acceptor : boost::noncopyable {
 public:
     using NewConnectionCallback =  std::function<void(int sockfd, const InetAddress &)>;
 

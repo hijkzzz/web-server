@@ -10,4 +10,6 @@
 #define LOG_ERROR BOOST_LOG_TRIVIAL(error)
 #define LOG_FATAL BOOST_LOG_TRIVIAL(fatal)
 
+const char* strerror_tl(int savedErrno);
+
 #endif //BASE_LOGGING_H

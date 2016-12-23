@@ -1,8 +1,9 @@
 #ifndef NET_POLLER_H
 #define NET_POLLER_H
 
-#include <base/NonCopyable.h>
 #include <net/EventLoop.h>
+
+#include <boost/noncopyable.hpp>
 
 #include <vector>
 #include <map>
@@ -12,7 +13,7 @@ struct pollfd;
 class Channel;
 
 // Poller 并不拥有 Channel
-class Poller : NonCopyable {
+class Poller : boost::noncopyable {
 public:
     using ChannelList =  std::vector<Channel *>;
     using Clock = std::chrono::steady_clock;
@@ -25,6 +26,7 @@ public:
 
     // 只能在 Loop 线程调用
     void updateChannel(Channel *channel);
+    void removeChannel(Channel* channel);
 
     void assertInLoopThread() { ownerLoop_->assertInLoopThread(); }
 

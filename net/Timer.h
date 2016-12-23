@@ -1,11 +1,12 @@
 #ifndef NET_TIMER_H
 #define NET_TIMER_H
 
-#include <base/NonCopyable.h>
 #include <net/Callbacks.h>
 #include <chrono>
 
-class Timer : NonCopyable {
+#include <boost/noncopyable.hpp>
+
+class Timer : boost::noncopyable {
 public:
     using Clock = std::chrono::steady_clock;
 

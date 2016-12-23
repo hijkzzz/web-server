@@ -1,6 +1,6 @@
 #include <net/SocketsOps.h>
 
-#include <base/Logging.h>
+#include <net/Logging.h>
 
 #include <fcntl.h>
 
@@ -25,6 +25,8 @@ namespace {
         flags = ::fcntl(sockfd, F_GETFD, 0);
         flags |= FD_CLOEXEC;
         ret   = ::fcntl(sockfd, F_SETFD, flags);
+
+        (void)ret;
     }
 }
 
@@ -134,4 +136,15 @@ struct sockaddr_in sockets::getLocalAddr(int sockfd) {
         LOG_ERROR << "sockets::getLocalAddr";
     }
     return localaddr;
+}
+
+int sockets::getSocketError(int sockfd) {
+    int       optval;
+    socklen_t optlen = sizeof optval;
+
+    if (::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, &optlen) < 0) {
+        return errno;
+    } else {
+        return optval;
+    }
 }

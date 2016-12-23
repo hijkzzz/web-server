@@ -1,11 +1,11 @@
 #ifndef NET_SOCKET_H
 #define NET_SOCKET_H
 
-#include <base/NonCopyable.h>
+#include <boost/noncopyable.hpp>
 
 class InetAddress;
 
-class Socket : NonCopyable{
+class Socket : boost::noncopyable {
 public:
     explicit Socket(int sockfd)
             : sockfd_(sockfd) {}

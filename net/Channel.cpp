@@ -1,6 +1,6 @@
 #include <net/Channel.h>
 
-#include <base/Logging.h>
+#include <net/Logging.h>
 #include <net/EventLoop.h>
 
 #include <poll.h>
@@ -17,15 +17,25 @@ Channel::Channel(EventLoop *loop, int fdArg)
           index_(-1) {
 }
 
+Channel::~Channel() {
+    assert(!eventHandling_);
+}
+
 void Channel::update() {
     loop_->updateChannel(this);
 }
 
 void Channel::handleEvent() {
+    eventHandling_ = true;
     if (revents_ & POLLNVAL) {
         LOG_WARNING << "Channel::handle_event() POLLNVAL";
     }
 
+    // POLLHUP - Hang up (output only)
+    if ((revents_ & POLLHUP) && !(revents_ & POLLIN)) {
+        LOG_WARNING << "Channel::handle_event() POLLHUP";
+        if (closeCallback_) closeCallback_();
+    }
     if (revents_ & (POLLERR | POLLNVAL)) {
         if (errorCallback_) errorCallback_();
     }
@@ -35,4 +45,5 @@ void Channel::handleEvent() {
     if (revents_ & POLLOUT) {
         if (writeCallback_) writeCallback_();
     }
+    eventHandling_ = false;
 }

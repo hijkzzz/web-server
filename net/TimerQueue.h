@@ -1,9 +1,10 @@
 #ifndef NET_TIMERQUEUE_H
 #define NET_TIMERQUEUE_H
 
-#include <base/NonCopyable.h>
 #include <net/Callbacks.h>
 #include <net/Channel.h>
+
+#include <boost/noncopyable.hpp>
 
 #include <vector>
 #include <set>
@@ -15,7 +16,7 @@ class EventLoop;
 class Timer;
 class TimerId;
 
-class TimerQueue : NonCopyable {
+class TimerQueue : boost::noncopyable {
 public:
     using Clock = std::chrono::steady_clock;
 
