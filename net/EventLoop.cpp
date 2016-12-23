@@ -5,7 +5,9 @@
 #include <net/Channel.h>
 #include <net/TimerQueue.h>
 
+#include <signal.h>
 #include <sys/eventfd.h>
+
 
 __thread EventLoop *t_loopInThisThread = 0;
 // poll 超时时间
@@ -19,6 +21,16 @@ static int createEventfd() {
     }
     return evtfd;
 }
+
+class IgnoreSigPipe {
+public:
+    IgnoreSigPipe() {
+        ::signal(SIGPIPE, SIG_IGN);
+    }
+};
+
+// 构造函数中忽略 SIGPIPE
+IgnoreSigPipe initObj;
 
 EventLoop::EventLoop()
         : looping_(false),

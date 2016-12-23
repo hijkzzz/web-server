@@ -63,6 +63,7 @@ void TcpConnection::sendInLoop(const std::string &message) {
             if (static_cast<size_t>(nwrote) < message.size()) {
                 LOG_TRACE << "I am going to write more data";
             }
+            // 此处应有"写完成回调"
         } else {
             nwrote = 0;
             if (errno != EWOULDBLOCK) {
@@ -75,6 +76,7 @@ void TcpConnection::sendInLoop(const std::string &message) {
     if (static_cast<size_t>(nwrote) < message.size()) {
         outputBuffer_.append(message.data() + nwrote, message.size() - nwrote);
         if (!channel_->isWriting()) {
+            // 等待可写
             channel_->enableWriting();
         }
     }
@@ -140,6 +142,7 @@ void TcpConnection::handleWrite() {
             outputBuffer_.retrieve(n);
             if (outputBuffer_.readableBytes() == 0) {
                 channel_->disableWriting();
+                // 此处应有"写完成回调"
                 if (state_ == kDisconnecting) {
                     shutdownInLoop();
                 }
