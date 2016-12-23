@@ -32,3 +32,8 @@ void Socket::setReuseAddr(bool on) {
     ::setsockopt(sockfd_, SOL_SOCKET, SO_REUSEADDR,
                  &optval, sizeof optval);
 }
+
+
+void Socket::shutdownWrite() {
+    sockets::shutdownWrite(sockfd_);
+}

@@ -32,26 +32,30 @@ public:
     const InetAddress &peerAddress() { return peerAddr_; }
     bool connected() const { return state_ == kConnected; }
 
+    // Thread safe.
+    void send(const std::string &message);
+    void shutdown();
+
     void setConnectionCallback(const ConnectionCallback &cb) { connectionCallback_ = cb; }
     void setMessageCallback(const MessageCallback &cb) { messageCallback_ = cb; }
     // Internal use only.
     void setCloseCallback(const CloseCallback& cb) { closeCallback_ = cb; }
 
-    // called when TcpServer accepts a new connection
     void connectEstablished();   // should be called only once
     // called when TcpServer has removed me from its map
     void connectDestroyed();  // should be called only once
 
 private:
-    enum StateE {
-        kConnecting, kConnected, kDisconnected
-    };
+    enum StateE { kConnecting, kConnected, kDisconnecting, kDisconnected, };
 
     void setState(StateE s) { state_ = s; }
     void handleRead(Clock::time_point receiveTime);
     void handleWrite();
     void handleClose();
     void handleError();
+
+    void sendInLoop(const std::string& message);
+    void shutdownInLoop();
 
     EventLoop                *loop_;
     std::string              name_;
@@ -65,6 +69,7 @@ private:
     MessageCallback          messageCallback_;
     CloseCallback            closeCallback_;
     Buffer                   inputBuffer_;
+    Buffer                   outputBuffer_;
 };
 
 #endif
