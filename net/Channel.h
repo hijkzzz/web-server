@@ -30,6 +30,7 @@ public:
     void enableReading() { events_ |= kReadEvent; update(); }
     void enableWriting() { events_ |= kWriteEvent; update(); }
     void disableWriting() { events_ &= ~kWriteEvent; update(); }
+    // pfd.fd = -channel->fd() - 1;
     void disableAll() { events_ = kNoneEvent; update(); }
 
     int index() { return index_; }
