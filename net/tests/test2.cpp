@@ -1,7 +1,9 @@
+/*
+ * 定时器测试
+ */
 #include <net/EventLoop.h>
 
 #include <unistd.h>
-// 定时器测试
 int cnt = 0;
 EventLoop *g_loop;
 

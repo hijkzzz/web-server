@@ -39,6 +39,8 @@ namespace sockets {
     void close(int sockfd);
     void toHostPort(char *buf, size_t size, const struct sockaddr_in &addr);
     void fromHostPort(const char *ip, uint16_t port, struct sockaddr_in *addr);
+
+    struct sockaddr_in getLocalAddr(int sockfd);
 }
 
 #endif
