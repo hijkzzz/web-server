@@ -31,6 +31,9 @@ public:
     void setConnectionCallback(const ConnectionCallback &cb) { connectionCallback_ = cb; }
     void setMessageCallback(const MessageCallback &cb) { messageCallback_ = cb; }
 
+    const std::string& ipPort() const { return name_; }
+    EventLoop* getLoop() const { return loop_; }
+
 private:
     // not thread safe, but in loop
     void newConnection(int sockfd, const InetAddress &peerAddr);
