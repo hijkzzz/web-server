@@ -3,6 +3,7 @@
 
 #include <net/Callbacks.h>
 #include <net/Channel.h>
+#include <net/TimerId.h>
 
 #include <boost/noncopyable.hpp>
 
@@ -13,7 +14,6 @@
 
 class EventLoop;
 class Timer;
-class TimerId;
 
 class TimerQueue : boost::noncopyable {
 public:
@@ -24,13 +24,16 @@ public:
                      Clock::time_point when,
                      int interval);
 
-    // void cancel(TimerId timerId);
+    void cancel(TimerId timerId);
 
 private:
     using Entry =  std::pair<Clock::time_point, std::shared_ptr<Timer>>;
     using TimerList =  std::set<Entry>;
+    using ActiveTimer = std::pair<std::shared_ptr<Timer>, int64_t>;
+    using ActiveTimerSet =  std::set<ActiveTimer>;
 
-    void addTimerInLoop(std::shared_ptr<Timer> timer);
+    void addTimerInLoop(std::shared_ptr<Timer> &timer);
+    void cancelInLoop(TimerId timerId);
     void handleRead(); // called when timerfd alarms
     std::vector<Entry> getExpired(Clock::time_point now); // move out all expired timers
     void reset(std::vector<Entry> &expired, Clock::time_point now);
@@ -41,6 +44,11 @@ private:
     const int timerfd_;
     Channel   timerfdChannel_;
     TimerList timers_; // Timer list sorted by expiration
+
+    // for cancel()
+    bool           callingExpiredTimers_;
+    ActiveTimerSet activeTimers_;
+    ActiveTimerSet cancelingTimers_;
 };
 
 

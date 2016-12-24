@@ -1,5 +1,7 @@
 #include <net/Timer.h>
 
+std::atomic<std::int64_t> Timer::s_numCreated_;
+
 void Timer::restart(Clock::time_point now) {
     if (repeat_) {
         expiration_ = now +

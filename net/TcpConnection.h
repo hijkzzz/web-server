@@ -8,6 +8,7 @@
 #include <boost/noncopyable.hpp>
 
 #include <memory>
+#include <atomic>
 
 class Channel;
 class EventLoop;
@@ -59,7 +60,7 @@ private:
 
     EventLoop                *loop_;
     std::string              name_;
-    StateE                   state_;  // FIXME: use atomic variable
+    std::atomic<StateE>      state_;
     // we don't expose those classes to client.
     std::unique_ptr<Socket>  socket_;
     std::unique_ptr<Channel> channel_;

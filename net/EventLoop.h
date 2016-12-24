@@ -37,6 +37,7 @@ public:
     TimerId runAt(const Clock::time_point& time, const TimerCallback& cb);
     TimerId runAfter(int delay, const TimerCallback& cb);
     TimerId runEvery(int interval, const TimerCallback& cb);
+    void cancel(TimerId timerId);
 
     void wakeup(); // 唤醒循环
     void updateChannel(Channel *channel);

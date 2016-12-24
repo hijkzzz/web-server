@@ -1,5 +1,6 @@
 /*
  * 定时器测试
+ * 测试标准定时和自取消
  */
 #include <net/EventLoop.h>
 
@@ -19,6 +20,13 @@ void print(const char *msg) {
     }
 }
 
+// 定时事件自己取消自己
+TimerId toCancel;
+void cancelSelf() {
+    print("cancelSelf()");
+    g_loop->cancel(toCancel);
+}
+
 int main() {
     printTid();
     EventLoop loop;
@@ -27,9 +35,9 @@ int main() {
     print("main");
     loop.runAfter(100, std::bind(print, "once100"));
     loop.runAfter(200, std::bind(print, "once200"));
-    loop.runAfter(300, std::bind(print, "once300"));
+    loop.runAfter(500, std::bind(print, "once500"));
     loop.runEvery(200, std::bind(print, "every200"));
-    loop.runEvery(300, std::bind(print, "every300"));
+    toCancel = loop.runEvery(500, cancelSelf);
 
     loop.loop();
     print("main loop exits");
