@@ -1,7 +1,7 @@
 #include <net/EventLoop.h>
 
 #include <net/Logging.h>
-#include <net/Poller.h>
+#include <net/EPoller.h>
 #include <net/Channel.h>
 #include <net/TimerQueue.h>
 
@@ -37,7 +37,7 @@ EventLoop::EventLoop()
           quit_(false),
           callingPendingFunctors_(false),
           threadId_(std::this_thread::get_id()),
-          poller_(new Poller(this)),
+          poller_(new EPoller(this)),
           timerQueue_(new TimerQueue(this)),
           wakeupFd_(createEventfd()),
           wakeupChannel_(new Channel(this, wakeupFd_)) {

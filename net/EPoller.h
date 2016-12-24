@@ -10,16 +10,16 @@
 #include <map>
 #include <chrono>
 
-struct pollfd;
+struct epoll_event;
 class Channel;
 
-// Poller 并不拥有 Channel
-class Poller : boost::noncopyable {
+// EPoller 并不拥有 Channel
+class EPoller : boost::noncopyable {
 public:
     using ChannelList =  std::vector<Channel *>;
 
-    Poller(EventLoop *loop);
-    ~Poller();
+    EPoller(EventLoop *loop);
+    ~EPoller();
 
     // 只能在 Loop 线程调用
     Clock::time_point poll(int timeoutMs, ChannelList *activeChannels);
@@ -31,14 +31,18 @@ public:
     void assertInLoopThread() { ownerLoop_->assertInLoopThread(); }
 
 private:
+    static const int kInitEventListSize = 1024;
+
     void fillActiveChannels(int numEvents,
                             ChannelList *activeChannels) const;
+    void update(int operation, Channel* channel);
 
-    using PollFdList =  std::vector<struct pollfd>;
+    using EventList =  std::vector<struct epoll_event>;
     using ChannelMap =  std::map<int, Channel *>;
 
     EventLoop  *ownerLoop_;
-    PollFdList pollfds_;
+    int        epollfd_;
+    EventList  events_;
     ChannelMap channels_;
 };
 

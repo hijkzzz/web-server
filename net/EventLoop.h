@@ -12,7 +12,7 @@
 #include <functional>
 #include <mutex>
 
-class Poller;
+class EPoller;
 class Channel;
 class TimerQueue;
 class TimerId;
@@ -62,7 +62,7 @@ private:
     bool                        callingPendingFunctors_;
     const std::thread::id       threadId_;
     Clock::time_point           pollReturnTime_;
-    std::unique_ptr<Poller>     poller_;
+    std::unique_ptr<EPoller>    poller_;
     std::unique_ptr<TimerQueue> timerQueue_;
     int                         wakeupFd_;
     std::unique_ptr<Channel>    wakeupChannel_;
