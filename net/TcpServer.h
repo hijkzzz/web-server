@@ -52,6 +52,7 @@ private:
     MessageCallback                      messageCallback_;
     bool                                 started_;
     int                                  nextConnId_;  // always in loop thread
+    // 维护 TcpConnectionPtr
     ConnectionMap                        connections_;
 };
 

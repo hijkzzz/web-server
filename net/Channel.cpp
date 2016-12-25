@@ -32,7 +32,7 @@ void Channel::handleEvent(Clock::time_point receiveTime) {
         LOG_WARNING << "Channel::handle_event() POLLNVAL";
     }
 
-    // POLLHUP - Hang up (output only)
+    // 文件描述符挂起
     if ((revents_ & POLLHUP) && !(revents_ & POLLIN)) {
         LOG_WARNING << "Channel::handle_event() POLLHUP";
         if (closeCallback_) closeCallback_();
