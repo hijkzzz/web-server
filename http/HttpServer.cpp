@@ -1,18 +1,18 @@
 #include <http/HttpServer.h>
 
+#include <http/HttpResponse.h>
+#include <http/HttpRequest.h>
+#include <http/HttpContext.h>
+#include <http/HttpHandler.h>
+
 #include <net/Logging.h>
 #include <net/TcpConnection.h>
 
-void defaultHttpCallback(const HttpRequest &, HttpResponse *resp) {
-    resp->setStatusCode(HttpResponse::k404NotFound);
-    resp->setStatusMessage("Not Found");
-    resp->setCloseConnection(true);
-}
 
 HttpServer::HttpServer(EventLoop *loop,
                        const InetAddress &listenAddr)
         : server_(loop, listenAddr),
-          httpCallback_(defaultHttpCallback) {
+          httpHandler_(&defaultHttpHandler) {
     server_.setConnectionCallback(
             std::bind(&HttpServer::onConnection, this, std::placeholders::_1));
     server_.setMessageCallback(
@@ -37,7 +37,7 @@ void HttpServer::onConnection(const TcpConnectionPtr &conn) {
 void HttpServer::onMessage(const TcpConnectionPtr &conn,
                            Buffer *buf,
                            Clock::time_point receiveTime) {
-    HttpContext *context = boost::any_cast<HttpContext>(conn->getMutableContext());
+    HttpContext *context =  boost::any_cast<HttpContext>(conn->getMutableContext());
 
     if (!context->parseRequest(buf, receiveTime)) {
         conn->send("HTTP/1.1 400 Bad Request\r\n\r\n");
@@ -51,11 +51,11 @@ void HttpServer::onMessage(const TcpConnectionPtr &conn,
 }
 
 void HttpServer::onRequest(const TcpConnectionPtr &conn, const HttpRequest &req) {
-    const std::string &connection = req.getHeader("Connection");
+    const std::string &connection = req.header("Connection");
     bool         close = connection == "close" ||
-                         (req.getVersion() == HttpRequest::kHttp10 && connection != "Keep-Alive");
+                         (req.version() == HttpRequest::kHttp10 && connection != "Keep-Alive");
     HttpResponse response(close);
-    httpCallback_(req, &response);
+    httpHandler_(req, &response);
     Buffer buf;
     response.appendToBuffer(&buf);
     conn->send(&buf);

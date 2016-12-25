@@ -6,6 +6,7 @@
 #include <net/Buffer.h>
 
 #include <boost/noncopyable.hpp>
+#include <boost/any.hpp>
 
 #include <memory>
 #include <atomic>
@@ -35,7 +36,12 @@ public:
 
     // Thread safe.
     void send(const std::string &message);
+    void send(Buffer *buf);
     void shutdown();
+
+    void setContext(const boost::any &context) { context_ = context; }
+    const boost::any &getContext() const { return context_; }
+    boost::any *getMutableContext() { return &context_; }
 
     void setConnectionCallback(const ConnectionCallback &cb) { connectionCallback_ = cb; }
     void setMessageCallback(const MessageCallback &cb) { messageCallback_ = cb; }
@@ -71,6 +77,7 @@ private:
     CloseCallback            closeCallback_;
     Buffer                   inputBuffer_;
     Buffer                   outputBuffer_;
+    boost::any               context_;
 };
 
 #endif

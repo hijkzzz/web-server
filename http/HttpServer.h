@@ -14,18 +14,17 @@ class HttpResponse;
 
 class HttpServer : boost::noncopyable {
 public:
-    typedef std::function<void(const HttpRequest &, HttpResponse *)> HttpCallback;
+    using HttpHandler =  std::function<void(const HttpRequest &, HttpResponse *)>;
 
     HttpServer(EventLoop *loop,
                const InetAddress &listenAddr);
-
     ~HttpServer();
 
     EventLoop *getLoop() const { return server_.getLoop(); }
 
     /// Not thread safe, callback be registered before calling start().
-    void setHttpCallback(const HttpCallback &cb) {
-        httpCallback_ = cb;
+    void setHttpCallback(const HttpHandler &cb) {
+        httpHandler_ = cb;
     }
     void setThreadNum(int numThreads) {
         server_.setThreadNum(numThreads);
@@ -41,9 +40,8 @@ private:
     void onRequest(const TcpConnectionPtr &, const HttpRequest &);
 
     TcpServer    server_;
-    HttpCallback httpCallback_;
+    HttpHandler httpHandler_;
     std::string  name_;
 };
-
 
 #endif

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #coding:utf-8
 
+#test7 对应的客户端
 import socket
 
 s = socket.socket()

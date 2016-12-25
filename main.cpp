@@ -1,6 +1,16 @@
-#include <iostream>
+#include <net/EventLoop.h>
+#include <net/InetAddress.h>
+#include <http/HttpServer.h>
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    int port = 8000;
+    int threadNum = 4;
+
+    // parse command
+
+    EventLoop loop;
+    HttpServer server(&loop, InetAddress(port));
+    server.setThreadNum(threadNum);
+    server.start();
     return 0;
 }
