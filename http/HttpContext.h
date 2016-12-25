@@ -35,7 +35,8 @@ public:
     HttpRequest &request() { return request_; }
 
 private:
-    bool processRequestLine(const char *begin, const char *end);
+    bool processRequestLine(Buffer *buf, std::string &uri);
+    bool processRequestBody(Buffer *buf);
 
     HttpRequestParseState state_;
     HttpRequest           request_;

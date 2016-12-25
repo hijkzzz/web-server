@@ -10,9 +10,10 @@
 
 
 HttpServer::HttpServer(EventLoop *loop,
-                       const InetAddress &listenAddr)
+                       const InetAddress &listenAddr, const std::string &name)
         : server_(loop, listenAddr),
-          httpHandler_(&defaultHttpHandler) {
+          httpHandler_(&defaultHttpHandler),
+          name_(name){
     server_.setConnectionCallback(
             std::bind(&HttpServer::onConnection, this, std::placeholders::_1));
     server_.setMessageCallback(
@@ -58,6 +59,7 @@ void HttpServer::onRequest(const TcpConnectionPtr &conn, const HttpRequest &req)
     httpHandler_(req, &response);
     Buffer buf;
     response.appendToBuffer(&buf);
+
     conn->send(&buf);
     if (response.closeConnection()) {
         conn->shutdown();

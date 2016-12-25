@@ -12,15 +12,40 @@
 class HttpRequest {
 public:
     enum Method { kInvalid, kGet, kPost, kHead, kPut, kDelete };
-    enum Version { kUnknown, kHttp10, kHttp11 };
+    enum Version { kUnknown, kHttp10, kHttp11, kHttp20 };
 
     HttpRequest()
             : method_(kInvalid),
               version_(kUnknown) {
     }
 
-    void setVersion(Version v) {
-        version_ = v;
+    bool setVersion(int major, int minor) {
+        switch (major) {
+        case 1:
+            switch (minor) {
+            case 0:
+                version_ = kHttp10;
+                break;
+            case 1:
+                version_ = kHttp11;
+                break;
+            default:
+                return false;
+            }
+            break;
+        case 2:
+            switch (minor) {
+            case 0:
+                version_ = kHttp20;
+                break;
+            default:
+                return false;
+            }
+            break;
+        default:
+            return false;
+        }
+        return true;
     }
     Version version() const { return version_; }
 
@@ -81,17 +106,9 @@ public:
     void setReceiveTime(Clock::time_point t) { receiveTime_ = t; }
     Clock::time_point receiveTime() const { return receiveTime_; }
 
-    void setHeader(const char *start, const char *colon, const char *end) {
-        std::string field(start, colon);
-        ++colon;
-        while (colon < end && isspace(*colon)) {
-            ++colon;
-        }
-        std::string value(colon, end);
-        while (!value.empty() && isspace(value[value.size() - 1])) {
-            value.resize(value.size() - 1);
-        }
-        headers_[field] = value;
+    void setHeader(const char *key_start, const char *key_end, const char *value_start, const char *value_end) {
+        std::string field(key_start, key_end);
+        headers_[field] = std::string(value_start, value_end);
     }
     std::string header(const std::string &field) const {
         std::string                                   result;

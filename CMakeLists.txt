@@ -3,7 +3,7 @@ project(speedX)
 
 enable_testing()
 
-set(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
+set(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS} -O3 -Wall")
 set(CMAKE_CXX_STANDARD 11)
 add_definitions(-DBOOST_LOG_DYN_LINK)
 

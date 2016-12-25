@@ -61,16 +61,18 @@ public:
         return str;
     }
 
+    std::string peekAsString() {
+        return std::string(peek(), readableBytes());
+    }
+
     void append(const std::string &str) {
         append(str.data(), str.length());
     }
-
     void append(const char * /*restrict*/ data, size_t len) {
         ensureWritableBytes(len);
         std::copy(data, data + len, beginWrite());
         hasWritten(len);
     }
-
     void append(const void * /*restrict*/ data, size_t len) {
         append(static_cast<const char *>(data), len);
     }
@@ -83,9 +85,7 @@ public:
     }
 
     char *beginWrite() { return begin() + writerIndex_; }
-
     const char *beginWrite() const { return begin() + writerIndex_; }
-
     void hasWritten(size_t len) { writerIndex_ += len; }
 
     void prepend(const void * /*restrict*/ data, size_t len) {

@@ -17,7 +17,7 @@ public:
     using HttpHandler =  std::function<void(const HttpRequest &, HttpResponse *)>;
 
     HttpServer(EventLoop *loop,
-               const InetAddress &listenAddr);
+               const InetAddress &listenAddr, const std::string &name);
     ~HttpServer();
 
     EventLoop *getLoop() const { return server_.getLoop(); }

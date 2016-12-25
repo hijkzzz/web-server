@@ -6,11 +6,11 @@ int main() {
     int port = 8000;
     int threadNum = 4;
 
-    // parse command
-
     EventLoop loop;
-    HttpServer server(&loop, InetAddress(port));
+    HttpServer server(&loop, InetAddress(port), "speedX");
     server.setThreadNum(threadNum);
     server.start();
+
+    loop.loop();
     return 0;
 }

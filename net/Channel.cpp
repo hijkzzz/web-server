@@ -26,6 +26,10 @@ void Channel::update() {
     loop_->updateChannel(this);
 }
 
+// 当一个socket出现错误时（例如 连接断开/拒绝/超时），epoll()会返回POLLERR加上注册时的POLLIN/POLLOUT事件。
+// 所以，如果监听的是POLLOUT，那epoll_wait()会返回POLLOUT|POLLERR；
+// 如果监听的是POLLIN，那epoll_wait()会返回POLLIN|POLLERR。
+
 void Channel::handleEvent(Clock::time_point receiveTime) {
     eventHandling_ = true;
     if (revents_ & POLLNVAL) {
@@ -40,6 +44,7 @@ void Channel::handleEvent(Clock::time_point receiveTime) {
     if (revents_ & (POLLERR | POLLNVAL)) {
         if (errorCallback_) errorCallback_();
     }
+    // 如果发生错误会关闭 handleClose
     if (revents_ & (POLLIN | POLLPRI | POLLRDHUP)) {
         if (readCallback_) readCallback_(receiveTime);
     }

@@ -4,6 +4,7 @@
 #include <http/HttpResponse.h>
 
 void defaultHttpHandler(const HttpRequest &, HttpResponse *resp) {
-    resp->setStatusCode(HttpResponse::k404NotFound);
-    resp->setStatusMessage("Not Found");
+    resp->setStatusCode(HttpResponse::k200Ok);
+    resp->setStatusMessage("OK");
+    resp->setBody("<html>Hello World!</html>");
 }
