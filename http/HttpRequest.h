@@ -48,6 +48,18 @@ public:
         return true;
     }
     Version version() const { return version_; }
+    std::string versionString() const {
+        switch (version_) {
+            case kHttp10:
+                return "1.0";
+            case kHttp11:
+                return "1.1";
+            case kHttp20:
+                return "2.0";
+            default:
+                return "UNKNOWN";
+        }
+    }
 
     bool setMethod(const char *start, const char *end) {
         assert(method_ == kInvalid);
@@ -69,8 +81,8 @@ public:
     }
     Method method() const { return method_; }
 
-    const char *methodString() const {
-        const char *result = "UNKNOWN";
+    std::string methodString() const {
+        std::string result = "UNKNOWN";
         switch (method_) {
             case kGet:
                 result = "GET";
