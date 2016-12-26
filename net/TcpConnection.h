@@ -35,9 +35,13 @@ public:
     bool connected() const { return state_ == kConnected; }
 
     // Thread safe.
-    void send(const std::string &message);
+    void send(std::string message);
+    void send(const char *message, int len);
     void send(Buffer *buf);
+
     void shutdown();
+    void forceClose();
+    void setTcpNoDelay(bool on);
 
     void setContext(const boost::any &context) { context_ = context; }
     const boost::any &getContext() const { return context_; }
@@ -61,12 +65,13 @@ private:
     void handleClose();
     void handleError();
 
-    void sendInLoop(const std::string& message);
+    void sendInLoop(const char *message, int len);
     void shutdownInLoop();
+    void forceCloseInLoop();
 
     EventLoop                *loop_;
     std::string              name_;
-    std::atomic<StateE>      state_;
+    StateE                   state_;
     // we don't expose those classes to client.
     std::unique_ptr<Socket>  socket_;
     std::unique_ptr<Channel> channel_;

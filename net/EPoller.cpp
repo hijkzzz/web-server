@@ -40,6 +40,7 @@ Clock::time_point EPoller::poll(int timeoutMs, ChannelList *activeChannels) {
                                        events_.data(),
                                        static_cast<int>(events_.size()),
                                        timeoutMs);
+    int savedErrno = errno;
     Clock::time_point now = Clock::now();
     if (numEvents > 0) {
         LOG_TRACE << numEvents << " events happended";
@@ -50,7 +51,10 @@ Clock::time_point EPoller::poll(int timeoutMs, ChannelList *activeChannels) {
     } else if (numEvents == 0) {
         LOG_TRACE << " nothing happended";
     } else {
-        LOG_ERROR << "EPoller::poll()";
+        if (savedErrno != EINTR) {
+            errno = savedErrno;
+            LOG_ERROR << "EPollPoller::poll()";
+        }
     }
     return now;
 }

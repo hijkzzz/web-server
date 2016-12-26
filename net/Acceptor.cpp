@@ -15,6 +15,11 @@ Acceptor::Acceptor(EventLoop *loop, const InetAddress &listenAddr)
             std::bind(&Acceptor::handleRead, this));
 }
 
+Acceptor::~Acceptor() {
+    acceptChannel_.disableAll();
+    acceptChannel_.remove();
+}
+
 void Acceptor::listen() {
     loop_->assertInLoopThread();
     listenning_ = true;

@@ -19,10 +19,10 @@ public:
 
     void handleEvent(Clock::time_point receiveTime);
 
-    void setReadCallback(const ReadEventCallback &cb) { readCallback_ = cb; }
-    void setWriteCallback(const EventCallback &cb) { writeCallback_ = cb; }
-    void setErrorCallback(const EventCallback &cb) { errorCallback_ = cb; }
-    void setCloseCallback(const EventCallback &cb) { closeCallback_ = cb; }
+    void setReadCallback(const ReadEventCallback &&cb) { readCallback_ = std::move(cb); }
+    void setWriteCallback(const EventCallback &&cb) { writeCallback_ = std::move(cb); }
+    void setErrorCallback(const EventCallback &&cb) { errorCallback_ = std::move(cb); }
+    void setCloseCallback(const EventCallback &&cb) { closeCallback_ = std::move(cb); }
 
 
     int fd() const { return fd_; }
@@ -41,6 +41,7 @@ public:
     void set_index(int idx) { index_ = idx; }
 
     EventLoop *ownerLoop() { return loop_; }
+    void remove();
 
 private:
     void update();
@@ -56,6 +57,7 @@ private:
     int       index_;   // used by Poller.
 
     bool eventHandling_;
+    bool addedToLoop_;
     ReadEventCallback readCallback_;
     EventCallback writeCallback_;
     EventCallback errorCallback_;

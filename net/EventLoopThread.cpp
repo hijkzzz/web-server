@@ -11,7 +11,7 @@ EventLoopThread::EventLoopThread()
 EventLoopThread::~EventLoopThread() {
     exiting_ = true;
     loop_->quit();
-    if (thread_.get())
+    if (thread_.get() != nullptr)
         thread_->join();
 }
 
@@ -20,7 +20,7 @@ EventLoop *EventLoopThread::startLoop() {
         thread_.reset(new std::thread(&EventLoopThread::threadFunc, this));
         std::unique_lock<std::mutex> lock(mutex_);
         // 等待线程运行
-        while (loop_ == NULL) {
+        while (loop_ == nullptr) {
             cond_.wait(lock);
         }
     }
@@ -34,9 +34,9 @@ void EventLoopThread::threadFunc() {
     {
         std::unique_lock<std::mutex> lock(mutex_);
         loop_ = &loop;
-        cond_.notify_all();
+        cond_.notify_one();
     }
 
     loop.loop();
-    //assert(exiting_);
+    loop_ = nullptr;
 }

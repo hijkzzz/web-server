@@ -41,7 +41,11 @@ public:
     // the evaluation of two functions are unspecified
     void retrieve(size_t len) {
         assert(len <= readableBytes());
-        readerIndex_ += len;
+        if (len < readableBytes()) {
+            readerIndex_ += len;
+        } else {
+            retrieveAll();
+        }
     }
 
     void retrieveUntil(const char *end) {
@@ -60,7 +64,6 @@ public:
         retrieveAll();
         return str;
     }
-
     std::string peekAsString() {
         return std::string(peek(), readableBytes());
     }

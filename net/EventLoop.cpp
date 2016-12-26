@@ -56,6 +56,8 @@ EventLoop::EventLoop()
 
 EventLoop::~EventLoop() {
     assert(!looping_);
+    wakeupChannel_->disableAll();
+    wakeupChannel_->remove();
     ::close(wakeupFd_);
     t_loopInThisThread = NULL;
 }
@@ -88,18 +90,18 @@ void EventLoop::quit() {
     }
 }
 
-void EventLoop::runInLoop(const Functor &cb) {
+void EventLoop::runInLoop(const Functor &&cb) {
     if (isInLoopThread()) {
         cb();
     } else {
-        queueInLoop(cb);
+        queueInLoop(std::move(cb));
     }
 }
 
-void EventLoop::queueInLoop(const Functor &cb) {
+void EventLoop::queueInLoop(const Functor &&cb) {
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        pendingFunctors_.push_back(cb);
+        pendingFunctors_.push_back(std::move(cb));
     }
 
     // 唤醒 EventLoop 处理 pendingFunctors
@@ -108,18 +110,18 @@ void EventLoop::queueInLoop(const Functor &cb) {
     }
 }
 
-TimerId EventLoop::runAt(const Clock::time_point& time, const TimerCallback& cb) {
-    return timerQueue_->addTimer(cb, time, 0.0);
+TimerId EventLoop::runAt(const Clock::time_point& time, const TimerCallback&& cb) {
+    return timerQueue_->addTimer(std::move(cb), time, 0.0);
 }
 
-TimerId EventLoop::runAfter(int delay, const TimerCallback& cb) {
+TimerId EventLoop::runAfter(int delay, const TimerCallback&& cb) {
     Clock::time_point time = Clock::now() + std::chrono::microseconds(delay);
-    return runAt(time, cb);
+    return runAt(time, std::move(cb));
 }
 
-TimerId EventLoop::runEvery(int interval, const TimerCallback& cb) {
+TimerId EventLoop::runEvery(int interval, const TimerCallback&& cb) {
     Clock::time_point time = Clock::now() + std::chrono::microseconds(interval);
-    return timerQueue_->addTimer(cb, time, interval);
+    return timerQueue_->addTimer(std::move(cb), time, interval);
 }
 
 void EventLoop::cancel(TimerId timerId) {

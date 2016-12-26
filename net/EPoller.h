@@ -31,7 +31,7 @@ public:
     void assertInLoopThread() { ownerLoop_->assertInLoopThread(); }
 
 private:
-    static const int kInitEventListSize = 1024;
+    static const int kInitEventListSize = 16;
 
     void fillActiveChannels(int numEvents,
                             ChannelList *activeChannels) const;

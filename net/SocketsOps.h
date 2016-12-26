@@ -3,6 +3,7 @@
 
 #include <arpa/inet.h>
 #include <endian.h>
+#include <netinet/tcp.h>
 
 namespace sockets {
     inline uint64_t hostToNetwork64(uint64_t host64) {

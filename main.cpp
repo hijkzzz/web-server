@@ -4,7 +4,7 @@
 
 int main() {
     int port = 8000;
-    int threadNum = 4;
+    int threadNum = 2;
 
     EventLoop loop;
     HttpServer server(&loop, InetAddress(port), "speedX");

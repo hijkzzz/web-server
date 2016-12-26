@@ -25,7 +25,7 @@ public:
     void setStatusMessage(const std::string &message) { statusMessage_ = message; }
     void setContentType(const std::string &contentType) { setHeader("Content-Type", contentType); }
     void setHeader(const std::string &key, const std::string &value) { headers_[key] = value; }
-    void setBody(const std::string &body) { body_ = body; }
+    void setBody(const std::string &&body) { body_ = std::move(body); }
 
     void setCloseConnection(bool on) { closeConnection_ = on; }
     bool closeConnection() const { return closeConnection_; }

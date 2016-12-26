@@ -32,6 +32,7 @@ void EventLoopThreadPool::start() {
 
 EventLoop *EventLoopThreadPool::getNextLoop() {
     baseLoop_->assertInLoopThread();
+    assert(started_);
     EventLoop *loop = baseLoop_;
 
     if (!loops_.empty()) {

@@ -23,7 +23,14 @@ Channel::~Channel() {
 }
 
 void Channel::update() {
+    addedToLoop_ = true;
     loop_->updateChannel(this);
+}
+
+void Channel::remove() {
+  assert(isNoneEvent());
+  addedToLoop_ = false;
+  loop_->removeChannel(this);
 }
 
 // 当一个socket出现错误时（例如 连接断开/拒绝/超时），epoll()会返回POLLERR加上注册时的POLLIN/POLLOUT事件。

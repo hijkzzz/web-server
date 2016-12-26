@@ -4,6 +4,6 @@
 class HttpRequest;
 class HttpResponse;
 
-void defaultHttpHandler(const HttpRequest &, HttpResponse *resp);
+void defaultHttpHandler(const HttpRequest &req, HttpResponse *resp);
 
 #endif
