@@ -22,11 +22,11 @@ TcpConnection::TcpConnection(EventLoop *loop,
           localAddr_(localAddr),
           peerAddr_(peerAddr) {
     if (loop_ == nullptr) {
-        LOG_FATAL << "init TcpConnection: loop is nullptr";
+        log_err("init TcpConnection: loop is nullptr");
+        abort();
     }
 
-    LOG_DEBUG << "TcpConnection::ctor[" << name_ << "] at " << this
-              << " fd=" << sockfd;
+    debug("TcpConnection::ctor[%s] at %p fd = %d", name_.c_str(), this, sockfd);
     channel_->setReadCallback(
             std::bind(&TcpConnection::handleRead, this, std::placeholders::_1));
     channel_->setWriteCallback(
@@ -38,8 +38,7 @@ TcpConnection::TcpConnection(EventLoop *loop,
 }
 
 TcpConnection::~TcpConnection() {
-    LOG_DEBUG << "TcpConnection::dtor[" << name_ << "] at " << this
-              << " fd=" << channel_->fd();
+    debug("TcpConnection::ctor[%s] at %p fd = %d", name_.c_str(), this, sockfd);
     assert(state_ == kDisconnected);
 }
 
@@ -89,13 +88,13 @@ void TcpConnection::sendInLoop(const char *message, int len) {
         nwrote = ::write(channel_->fd(), message, len);
         if (nwrote >= 0) {
             if (static_cast<int>(nwrote) < len) {
-                LOG_TRACE << "I am going to write more data";
+                log_info("I am going to write more data");
             }
             // 此处应有"写完成回调"
         } else {
             nwrote = 0;
             if (errno != EWOULDBLOCK) {
-                LOG_ERROR << "TcpConnection::sendInLoop";
+                log_info("TcpConnection::sendInLoop");
             }
         }
     }
@@ -176,7 +175,7 @@ void TcpConnection::handleRead(Clock::time_point receiveTime) {
         handleClose();
     } else {
         errno = savedErrno;
-        LOG_ERROR << "TcpConnection::handleRead";
+        log_err("TcpConnection::handleRead");
         handleError();
     }
 }
@@ -196,19 +195,19 @@ void TcpConnection::handleWrite() {
                     shutdownInLoop();
                 }
             } else {
-                LOG_TRACE << "I am going to write more data";
+                log_info("I am going to write more data");
             }
         } else {
-            LOG_ERROR << "TcpConnection::handleWrite";
+            log_info("TcpConnection::handleWrite");
         }
     } else {
-        LOG_TRACE << "Connection is down, no more writing";
+        log_info("Connection is down, no more writing");
     }
 }
 
 void TcpConnection::handleClose() {
     loop_->assertInLoopThread();
-    LOG_TRACE << "TcpConnection::handleClose state = " << state_;
+    log_info("TcpConnection::handleClose state = %d", state_);
     assert(state_ == kConnected || state_ == kDisconnecting);
     // we don't close fd, leave it to dtor, so we can find leaks easily.
     channel_->disableAll();
@@ -218,6 +217,5 @@ void TcpConnection::handleClose() {
 
 void TcpConnection::handleError() {
     int err = sockets::getSocketError(channel_->fd());
-    LOG_ERROR << "TcpConnection::handleError [" << name_
-              << "] - SO_ERROR = " << err << " " << strerror_tl(err);
+    log_err("TcpConnection::handleError [%s] - SO_ERROR = %d %s", name_.c_str(), err, strerror_tl(err));
 }

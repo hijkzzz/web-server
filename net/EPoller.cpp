@@ -4,6 +4,7 @@
 #include <net/Channel.h>
 
 #include <assert.h>
+#include <strings.h>
 #include <poll.h>
 #include <sys/epoll.h>
 
@@ -27,7 +28,7 @@ EPoller::EPoller(EventLoop *loop)
           epollfd_(::epoll_create1(EPOLL_CLOEXEC)),
           events_(kInitEventListSize) {
     if (epollfd_ < 0) {
-        LOG_FATAL << "EPoller::EPoller";
+        log_err("EPoller::EPoller");
     }
 }
 
@@ -43,17 +44,17 @@ Clock::time_point EPoller::poll(int timeoutMs, ChannelList *activeChannels) {
     int savedErrno = errno;
     Clock::time_point now = Clock::now();
     if (numEvents > 0) {
-        LOG_TRACE << numEvents << " events happended";
+        log_info("%d events happended", numEvents);
         fillActiveChannels(numEvents, activeChannels);
         if (static_cast<size_t>(numEvents) == events_.size()) {
             events_.resize(events_.size() * 2);
         }
     } else if (numEvents == 0) {
-        LOG_TRACE << " nothing happended";
+        log_info("nothing happended");
     } else {
         if (savedErrno != EINTR) {
             errno = savedErrno;
-            LOG_ERROR << "EPollPoller::poll()";
+            log_err("EPollPoller::poll()");
         }
     }
     return now;
@@ -77,7 +78,7 @@ void EPoller::fillActiveChannels(int numEvents,
 
 void EPoller::updateChannel(Channel *channel) {
     assertInLoopThread();
-    LOG_TRACE << "fd = " << channel->fd() << " events = " << channel->events();
+    log_info("update fd = %d events = %d",channel->fd(), channel->events());
     const int index = channel->index();
     if (index == kNew || index == kDeleted) {
         // a new one, add with EPOLL_CTL_ADD
@@ -110,7 +111,7 @@ void EPoller::updateChannel(Channel *channel) {
 void EPoller::removeChannel(Channel *channel) {
     assertInLoopThread();
     int fd = channel->fd();
-    LOG_TRACE << "fd = " << fd;
+    log_info("remove fd = %d", fd);
     assert(channels_.find(fd) != channels_.end());
     assert(channels_[fd] == channel);
     assert(channel->isNoneEvent());
@@ -134,9 +135,9 @@ void EPoller::update(int operation, Channel *channel) {
     int fd = channel->fd();
     if (::epoll_ctl(epollfd_, operation, fd, &event) < 0) {
         if (operation == EPOLL_CTL_DEL) {
-            LOG_ERROR << "epoll_ctl op=" << operation << " fd=" << fd;
+            log_err("epoll_ctl op = %d fd = %d", operation, fd);
         } else {
-            LOG_FATAL << "epoll_ctl op=" << operation << " fd=" << fd;
+            log_err("epoll_ctl op = %d fd = %d", operation, fd);
         }
     }
 }

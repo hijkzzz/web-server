@@ -3,6 +3,7 @@
 #include <net/Logging.h>
 #include <net/EventLoop.h>
 
+#include <assert.h>
 #include <poll.h>
 
 const int Channel::kNoneEvent  = 0;
@@ -40,12 +41,12 @@ void Channel::remove() {
 void Channel::handleEvent(Clock::time_point receiveTime) {
     eventHandling_ = true;
     if (revents_ & POLLNVAL) {
-        LOG_WARNING << "Channel::handle_event() POLLNVAL";
+        log_warn("Channel::handle_event() POLLNVAL");
     }
 
     // 文件描述符挂起
     if ((revents_ & POLLHUP) && !(revents_ & POLLIN)) {
-        LOG_WARNING << "Channel::handle_event() POLLHUP";
+        log_warn("Channel::handle_event() POLLHUP");
         if (closeCallback_) closeCallback_();
     }
     if (revents_ & (POLLERR | POLLNVAL)) {

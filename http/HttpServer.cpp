@@ -24,8 +24,7 @@ HttpServer::~HttpServer() {
 }
 
 void HttpServer::start() {
-    LOG_WARNING << "HttpServer[" << name_
-             << "] starts listenning on " << server_.ipPort();
+    log_info("HttpServer[%s] starts listenning on %s", name_.c_str(), server_.ipPort().c_str());
     server_.start();
 }
 

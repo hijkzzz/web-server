@@ -5,14 +5,15 @@
 #include <net/Timer.h>
 #include <net/TimerId.h>
 
+#include <assert.h>
 #include <sys/timerfd.h>
-
+#include <strings.h>
 
 int createTimerfd() {
     int timerfd = ::timerfd_create(CLOCK_MONOTONIC,
                                    TFD_NONBLOCK | TFD_CLOEXEC);
     if (timerfd < 0) {
-        LOG_FATAL << "Failed in timerfd_create";
+        log_err("Failed in timerfd_create");
     }
     return timerfd;
 }
@@ -34,9 +35,9 @@ struct timespec howMuchTimeFromNow(Clock::time_point when) {
 void readTimerfd(int timerfd, Clock::time_point now) {
     uint64_t howmany;
     ssize_t  n = ::read(timerfd, &howmany, sizeof howmany);
-    LOG_TRACE << "TimerQueue::handleRead() " << howmany << " at " << now.time_since_epoch().count();
+    log_info("TimerQueue::handleRead() %lu at %ld", howmany, now.time_since_epoch().count());
     if (n != sizeof howmany) {
-        LOG_ERROR << "TimerQueue::handleRead() reads " << n << " bytes instead of 8";
+        log_err("TimerQueue::handleRead() reads %lu bytes instead of 8", n);
     }
 }
 
@@ -49,7 +50,7 @@ void resetTimerfd(int timerfd, Clock::time_point expiration) {
     newValue.it_value = howMuchTimeFromNow(expiration);
     int ret = ::timerfd_settime(timerfd, 0, &newValue, &oldValue);
     if (ret) {
-        LOG_ERROR << "timerfd_settime()";
+        log_err("timerfd_settime()");
     }
 }
 
@@ -101,7 +102,7 @@ void TimerQueue::cancelInLoop(TimerId timerId) {
     assert(timers_.size() == activeTimers_.size());
     std::shared_ptr<Timer> t = timerId.timer_.lock();
     if (!t) {
-        LOG_TRACE << "Timer has been deleted";
+        log_info("Timer has been deleted");
         return;
     }
 
@@ -183,7 +184,7 @@ void TimerQueue::reset(std::vector<Entry> &expired, Clock::time_point now) {
     }
 
     if (nextExpire != nextExpire.max()) {
-        LOG_TRACE << "reset Timerfd nextExpire " << nextExpire.time_since_epoch().count() / 1000;
+        log_info("reset Timerfd nextExpire %ld", nextExpire.time_since_epoch().count() / 1000);
         resetTimerfd(timerfd_, nextExpire);
     }
 }

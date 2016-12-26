@@ -6,6 +6,7 @@
 #include <net/TimerQueue.h>
 
 #include <signal.h>
+#include <assert.h>
 #include <sys/eventfd.h>
 
 
@@ -16,7 +17,7 @@ const int kPollTimeMs = 10000;
 static int createEventfd() {
     int evtfd = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
     if (evtfd < 0) {
-        LOG_ERROR << "Failed in eventfd";
+        log_err("Failed in eventfd");
         abort();
     }
     return evtfd;
@@ -41,10 +42,10 @@ EventLoop::EventLoop()
           timerQueue_(new TimerQueue(this)),
           wakeupFd_(createEventfd()),
           wakeupChannel_(new Channel(this, wakeupFd_)) {
-    LOG_TRACE << "EventLoop created " << this << " in thread " << threadId_;
+    log_info("EventLoop created %p in thread %s", this, threadString(threadId_).c_str());
     if (t_loopInThisThread) {
-        LOG_FATAL << "Another EventLoop " << t_loopInThisThread
-                  << " exists in this thread " << threadId_;
+        log_err("Another EventLoop %p exists in this thread %s", t_loopInThisThread,
+                  threadString(threadId_).c_str());
     } else {
         t_loopInThisThread = this;
     }
@@ -79,7 +80,7 @@ void EventLoop::loop() {
         doPendingFunctors();
     }
 
-    LOG_TRACE << "EventLoop " << this << " stop looping";
+    log_info("EventLoop %p stop looping", this);
     looping_ = false;
 }
 
@@ -141,16 +142,17 @@ void EventLoop::removeChannel(Channel *channel) {
 }
 
 void EventLoop::abortNotInLoopThread() {
-    LOG_FATAL << "EventLoop::abortNotInLoopThread - EventLoop " << this
-              << " was created in threadId_ = " << threadId_
-              << ", current thread id = " << std::this_thread::get_id();
+    log_err("EventLoop::abortNotInLoopThread - EventLoop %p was created in threadId_ = %s, current thread id = %s",
+            this,
+            threadString(threadId_).c_str(),
+            threadString(std::this_thread::get_id()).c_str());
 }
 
 void EventLoop::wakeup() {
     uint64_t one = 1;
     ssize_t  n   = ::write(wakeupFd_, &one, sizeof one);
     if (n != sizeof one) {
-        LOG_ERROR << "EventLoop::wakeup() writes " << n << " bytes instead of 8";
+        log_err("EventLoop::wakeup() writes %ld bytes instead of 8", n);
     }
 }
 
@@ -158,7 +160,7 @@ void EventLoop::handleRead() {
     uint64_t one = 1;
     ssize_t  n   = ::read(wakeupFd_, &one, sizeof one);
     if (n != sizeof one) {
-        LOG_ERROR << "EventLoop::handleRead() reads " << n << " bytes instead of 8";
+        log_err("EventLoop::handleRead() reads %ld bytes instead of 8", n);
     }
 }
 
