@@ -5,9 +5,13 @@
 int main() {
     int port = 8000;
     int threadNum = 4;
+    std::string root = "WWW";
 
     EventLoop loop;
-    HttpServer server(&loop, InetAddress(port), "speedX");
+    HttpServer server(&loop,
+                      InetAddress(port),
+                      "speedX",
+                      root);
     server.setThreadNum(threadNum);
     server.start();
 

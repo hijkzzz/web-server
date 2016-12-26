@@ -17,8 +17,12 @@ namespace {
     }
 }
 
-void defaultHttpHandler(const HttpRequest &req, HttpResponse *resp) {
+void defaultHttpHandler(const HttpRequest &req, HttpResponse *resp, HttpServer *server) {
     resp->setStatusCode(HttpResponse::k200Ok);
     resp->setStatusMessage("OK");
     resp->setBody(requestString(req));
+}
+
+void webServerHandler(const HttpRequest &req, HttpResponse *resp, HttpServer *server) {
+
 }

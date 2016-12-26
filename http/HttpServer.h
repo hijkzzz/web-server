@@ -14,10 +14,12 @@ class HttpResponse;
 
 class HttpServer : boost::noncopyable {
 public:
-    using HttpHandler =  std::function<void(const HttpRequest &, HttpResponse *)>;
+    using HttpHandler =  std::function<void(const HttpRequest &, HttpResponse *, HttpServer *server)>;
 
     HttpServer(EventLoop *loop,
-               const InetAddress &listenAddr, const std::string &name);
+               const InetAddress &listenAddr,
+               const std::string &name,
+               const std::string &root);
     ~HttpServer();
 
     EventLoop *getLoop() const { return server_.getLoop(); }
@@ -42,6 +44,7 @@ private:
     TcpServer    server_;
     HttpHandler httpHandler_;
     std::string  name_;
+    std::string  root_;
 };
 
 #endif
