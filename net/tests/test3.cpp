@@ -8,8 +8,6 @@
 
 #include <iostream>
 
-#include <unistd.h>
-
 void runInThread() {
     std::cout << "runInThread: pid = " << getpid() << ", tid = " << std::this_thread::get_id() << std::endl;
 }
@@ -19,10 +17,8 @@ int main() {
 
     EventLoopThread loopThread;
     EventLoop *loop = loopThread.startLoop();
-    loop->runInLoop(runInThread);
+    loop->runInLoop(&runInThread);
     sleep(1);
-    loop->runAfter(500, runInThread);
-    sleep(3);
 
     loop->quit();
 

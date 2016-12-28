@@ -1,4 +1,5 @@
 .DS_Store
-cmake-build-debug/
 .idea/
+cmake-build-debug/
 build/
+!build/www/

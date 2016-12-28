@@ -13,7 +13,6 @@ public:
         k200Ok               = 200,
         k301MovedPermanently = 301,
         k400BadRequest       = 400,
-        k403Forbidden        = 403,
         k404NotFound         = 404,
     };
 
