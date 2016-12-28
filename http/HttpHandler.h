@@ -6,6 +6,5 @@ class HttpResponse;
 class HttpServer;
 
 void defaultHttpHandler(const HttpRequest &req, HttpResponse *resp, HttpServer *server);
-void webServerHandler(const HttpRequest &req, HttpResponse *resp, HttpServer *server);
 
 #endif

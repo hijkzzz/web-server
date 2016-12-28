@@ -5,7 +5,7 @@
 int main() {
     int port = 8000;
     int threadNum = 4;
-    std::string root = "WWW";
+    std::string root = "./www";
 
     EventLoop loop;
     HttpServer server(&loop,

@@ -31,6 +31,7 @@ public:
     void setThreadNum(int numThreads) {
         server_.setThreadNum(numThreads);
     }
+    const std::string &root() const { return root_; }
 
     void start();
 

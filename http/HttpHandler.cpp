@@ -2,27 +2,31 @@
 
 #include <http/HttpRequest.h>
 #include <http/HttpResponse.h>
+#include <http/HttpServer.h>
 
-namespace {
-    std::string requestString(const HttpRequest &req) {
-        std::string body;
-        body.append(req.methodString() + " "
-                    + req.path() + " "
-                    + req.query() + " HTTP/"
-                    + req.versionString() + "\n");
-        for (auto i : req.headers()) {
-            body.append(i.first + ": " + i.second + "\n");
-        }
-        return body;
-    }
-}
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
 
 void defaultHttpHandler(const HttpRequest &req, HttpResponse *resp, HttpServer *server) {
-    resp->setStatusCode(HttpResponse::k200Ok);
-    resp->setStatusMessage("OK");
-    resp->setBody(requestString(req));
-}
+    std::string fileName = server->root() + req.path();
+    if(req.path() == "/") {
+        fileName.append("index.html");
+    }
 
-void webServerHandler(const HttpRequest &req, HttpResponse *resp, HttpServer *server) {
+    struct stat sbuf;
+    if(::stat(fileName.c_str(), &sbuf) < 0) {
+        resp->setStatusCode(HttpResponse::k404NotFound);
+        resp->setStatusMessage("Not Found");
+        return;
+    }
+
+    if (!(S_ISREG(sbuf.st_mode)) || !(S_IRUSR & sbuf.st_mode)) {
+        resp->setStatusCode(HttpResponse::k403Forbidden);
+        resp->setStatusMessage("Forbidden");
+        return;
+    }
+
 
 }

@@ -3,7 +3,6 @@
 #include <net/Logging.h>
 #include <net/EPoller.h>
 #include <net/Channel.h>
-#include <net/TimerQueue.h>
 
 #include <signal.h>
 #include <assert.h>
@@ -39,7 +38,6 @@ EventLoop::EventLoop()
           callingPendingFunctors_(false),
           threadId_(std::this_thread::get_id()),
           poller_(new EPoller(this)),
-          timerQueue_(new TimerQueue(this)),
           wakeupFd_(createEventfd()),
           wakeupChannel_(new Channel(this, wakeupFd_)) {
     log_info("EventLoop created %p in thread %s", this, threadString(threadId_).c_str());
@@ -109,24 +107,6 @@ void EventLoop::queueInLoop(const Functor &&cb) {
     if (!isInLoopThread() || callingPendingFunctors_) {
         wakeup();
     }
-}
-
-TimerId EventLoop::runAt(const Clock::time_point& time, const TimerCallback&& cb) {
-    return timerQueue_->addTimer(std::move(cb), time, 0.0);
-}
-
-TimerId EventLoop::runAfter(int delay, const TimerCallback&& cb) {
-    Clock::time_point time = Clock::now() + std::chrono::microseconds(delay);
-    return runAt(time, std::move(cb));
-}
-
-TimerId EventLoop::runEvery(int interval, const TimerCallback&& cb) {
-    Clock::time_point time = Clock::now() + std::chrono::microseconds(interval);
-    return timerQueue_->addTimer(std::move(cb), time, interval);
-}
-
-void EventLoop::cancel(TimerId timerId) {
-    return timerQueue_->cancel(timerId);
 }
 
 void EventLoop::updateChannel(Channel *channel) {

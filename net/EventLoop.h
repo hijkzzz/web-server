@@ -2,7 +2,6 @@
 #define NET_EVENTLOOP_H
 
 #include <net/Callbacks.h>
-#include <net/TimerId.h>
 
 #include <boost/noncopyable.hpp>
 
@@ -64,7 +63,6 @@ private:
     const std::thread::id       threadId_;
     Clock::time_point           pollReturnTime_;
     std::unique_ptr<EPoller>    poller_;
-    std::unique_ptr<TimerQueue> timerQueue_;
     int                         wakeupFd_;
     std::unique_ptr<Channel>    wakeupChannel_;
 
