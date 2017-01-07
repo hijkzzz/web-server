@@ -9,11 +9,11 @@ Multi-Threads Web Server
 
 *Establish Connection*
 
-![](https://raw.githubusercontent.com/hijkzzz/speedX/master/picture1.png)
+![](https://raw.githubusercontent.com/hijkzzz/speedX/master/newConnection.png)
 
 *Close Connection*
 
-![](https://raw.githubusercontent.com/hijkzzz/speedX/master/picture2.png)
+![](https://raw.githubusercontent.com/hijkzzz/speedX/master/closeConnection.png)
 
 
 ## Requirements
