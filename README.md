@@ -5,7 +5,7 @@ Multi-Threads Web Server
 
 ## Structure
 
-**One loop per thread + Thread Pool**
+**One loop per thread**
 
 *Establish Connection*
 
