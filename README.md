@@ -1,20 +1,28 @@
-# speedX
+# speed-x
 ![Build Status](https://img.shields.io/teamcity/codebetter/bt428.svg)
+Multi-Threaded Web Server
 
-Multi-Threads Web Server
+## Design Pattern
+**One Loop Per Thread**
 
-## Structure
+Each thread has an event loop `epoll`
 
-**One loop per thread**
+**Multiple Reactor**
 
-*Establish Connection*
+Main event loop is responsible for `listenfd` and `accept`
+Sub event loop is responsible for `handleEvent`
+Use the roundbin scheduling policy
 
+## Flow Diagram
+**Establish Connection**
 ![](https://raw.githubusercontent.com/hijkzzz/speedX/master/newConnection.png)
 
-*Close Connection*
+The main reactor(event loop) distributes the connection to the sub-reactor, when a new connection is made
 
+
+
+**Close Connection**
 ![](https://raw.githubusercontent.com/hijkzzz/speedX/master/closeConnection.png)
-
 
 ## Requirements
 - Linux
