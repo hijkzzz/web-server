@@ -8,13 +8,13 @@ Multi-Threaded Web Server
 
 **One Loop Per Thread**
 
-Each thread has an event loop `epoll`
+* Each thread has an event loop `epoll`
 
 **Multiple Reactor**
 
-Main event loop is responsible for `listenfd` and `accept`
-Sub event loop is responsible for `handleEvent`
-Use the roundbin scheduling policy
+* Main event loop is responsible for `listenfd` and `accept`
+* Sub event loop is responsible for `handleEvent`
+* Use the roundbin scheduling policy
 
 ## Flow Diagram
 
