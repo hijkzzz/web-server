@@ -50,3 +50,7 @@ make
 
 http://127.0.0.1:8000
 ```
+
+## References
+
+- Linux多线程服务端编程
