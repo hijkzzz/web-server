@@ -1,8 +1,6 @@
 # speed-x
 
-![Build Status](https://img.shields.io/teamcity/codebetter/bt428.svg)
-
-Multi-Threaded Web Server
+A HTTP server designed with Reactor I/O Model
 
 ## Design Pattern
 
